@@ -6,15 +6,21 @@ __lua__
 splats={}
 t_flow = 28
 player={}
+trans={}
 debug=false
 level=1
+next_level=1
 init_lvl=false
 fin={}
 
 function _init()
  
 	
-	
+	trans.x = 0
+	trans.y = -128
+	trans.vis= false
+	trans.t_s = 0
+	trans.init = false
 	
 	player.x = 48
 	player.y = 48
@@ -32,7 +38,7 @@ function _init()
 	
 end
 
-function _update()	
+function _update()
 
 	if (time() % 1 == 0.1) then
 		flow()
@@ -40,6 +46,7 @@ function _update()
 	end
 	
 	player_movement()
+	check_fin()
 	
 end
 
@@ -52,8 +59,11 @@ function _draw()
 	draw_bg()
 	draw_fin()
 	draw_player()
-	draw_debug()
 	draw_ui()
+	draw_trans()
+	
+	
+	draw_debug()
 	
 end
 
@@ -67,14 +77,10 @@ function draw_ui()
 	spr(38,8,112)
 	spr(39,16,112)
 	spr(40,24,112)
-	--spr(39,32,112)
-	--spr(40,40,112)
 	
 	spr(54,8,120)
 	spr(55,16,120)
 	spr(56,24,120)
-	--spr(55,32,120)
-	--spr(56,40,120)
 	
 	print("➡️ ".. level,
 		12,118,1)
@@ -82,6 +88,7 @@ function draw_ui()
 		12,117,7)
 
 end
+
 function draw_fin()
 	spr(fin.a, fin.x,fin.y)
 	
@@ -94,6 +101,60 @@ function draw_fin()
 	end
 end
 
+function check_fin()
+
+	if player.x == fin.x and
+		player.y == fin.y then
+			start_trans()
+	end
+end
+
+function draw_trans()
+
+	if trans.vis == true then
+		
+		local timer=(time()-trans.t_s )
+			/1%1
+			
+			if timer > 0.95 then
+				trans.vis = false
+				trans.t_s = 0
+			end
+			
+			if timer > 0.5 and
+				trans.init == false then
+				
+				init_lvl(level)
+				trans.init = true
+				
+			end
+			
+			trans.y = lerp(-136,
+			128,smooth_step(timer))
+			
+			build_trans()
+	end
+	
+end
+
+function build_trans()
+	rectfill(0,trans.y,
+				128,trans.y+128,8)
+				
+	for i=0,128,8 do
+		spr(59,i,trans.y-8)
+		spr(59,i,trans.y+128,
+			1,1,false,true)
+	end
+end
+
+function start_trans()
+	if trans.vis == false then
+		trans.vis = true
+		trans.t_s = time()
+		trans.init = false
+	end
+end
 
 function set_splats()
 	for i=1,#splats do
@@ -644,16 +705,11 @@ end
 --debug
 function draw_debug()
 	if debug==true then
-		print("spl : " .. 
-			#splats,16,16,10)
-			
-		local p_s = {}
-		p_s=get_splat(player.x,player.y)
+		print(player.x .. " " ..
+		player.y,16,16,10)
+		print(fin.x .. " " ..
+		fin.y,16,24,10)
 
-			
-		print("time : " .. time(),
-		16,32)
-			
 		
 	end
 end
@@ -678,7 +734,24 @@ function lvl_1()
 	local r_d = {}
 	
 	box_lvl(r_p)
+	
+	add_ob(1,2,r_d)
+	add_ob(2,2,r_d)
+	add_ob(2,1,r_d)
+	
+	add_ob(1,10,r_d)
+	add_ob(2,10,r_d)
 	add_ob(3,10,r_d)
+	add_ob(1,11,r_d)
+	add_ob(2,11,r_d)
+	add_ob(1,12,r_d)
+	add_ob(2,12,r_d)
+	add_ob(1,13,r_d)
+	add_ob(2,13,r_d)
+	add_ob(3,13,r_d)
+	add_ob(4,13,r_d)
+	add_ob(5,13,r_d)
+	
 	add_ob(4,10,r_d)
 	add_ob(5,10,r_d)
 	add_ob(3,11,r_d)
@@ -686,6 +759,9 @@ function lvl_1()
 	add_ob(3,12,r_d)
 	add_ob(4,12,r_d)
 	add_ob(5,12,r_d)
+	
+	
+	
 	
 	local function setup()
 		
@@ -695,8 +771,8 @@ function lvl_1()
 		player.y_m=11*8
 		fin.x=12*8
 		fin.y=3*8
-		//add_splat(64,64,8,8,4)
-		//add_splat(72,64,8,8,4)
+		add_splat(8,8,8,8,4)
+		--add_splat(72,64,8,8,4)
 
 	end
 		
@@ -756,14 +832,25 @@ function init_lvl(lvl)
 	local r_p = levels[lvl].r_p
 	local r_d = levels[lvl].r_d
 	
+	clear_map()
+	
 	splats={}
 	
 	init_st_obs(8,r_p)
 	init_st_obs(7,r_d)
 	
-	levels[lvl].s();
+	levels[lvl].s()
+	player.e = 3
 
+end
 
+function clear_map()
+
+	for x=0,15 do
+  for y=0,15 do
+   mset(x, y, 0)
+		end	
+	end
 end
 
 function init_st_obs(ind,obs)
@@ -811,12 +898,12 @@ __gfx__
 0000000000000000000000000000000000000000000000001dddddddddddddddddddddd600000000000000000000000000000000000000000000000000000000
 0000000000000000888888800888888800000000000000001dddddddddddddddddddddd600000000000000000000000000000000000000000000000000000000
 0088888800000888888888800888888800888800000000001dddddddddddddddddddddd600000000000000000000000000000000000000000000000000000000
-0888888800008888888888800888888808888880000000001dddddddddddddddddddddd600000000000000000000000000000000000000000000000000000000
-0888888800008888888888800888888808888880000000001dddddddddddddddddddddd600000000000000000000000000000000000000000000000000000000
-0888888800008888888888800888888808888880000000001dddddddddddddddddddddd600000000000000000000000000000000000000000000000000000000
-0888888800008888888888000888888808888880000000001dddddddddddddddddddddd600000000000000000000000000000000000000000000000000000000
-0088888800000888888880000888888808888880000000001dddddddddddddddddddddd600000000000000000000000000000000000000000000000000000000
-00000000000000000000000008888888088888800000000016666666666666666666666600000000000000000000000000000000000000000000000000000000
+0888888800008888888888800888888808888880000000001dddddddddddddddddddddd600000000000000000808080800000000000000000000000000000000
+0888888800008888888888800888888808888880000000001dddddddddddddddddddddd600000000000000008080808000000000000000000000000000000000
+0888888800008888888888800888888808888880000000001dddddddddddddddddddddd600000000000000000808080800000000000000000000000000000000
+0888888800008888888888000888888808888880000000001dddddddddddddddddddddd600000000000000008080808000088000000000000000000000000000
+0088888800000888888880000888888808888880000000001dddddddddddddddddddddd600000000000000000888088880888808000000000000000000000000
+00000000000000000000000008888888088888800000000016666666666666666666666600000000000000008888888888888888000000000000000000000000
 00000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __sfx__
 0001000008750087500975009750097500a7500b7500c7500e7500410005100031000310003100051000010017000190001b0001c0001d0001e0001e0001e0001e0001e000040000400003000030000200002000
