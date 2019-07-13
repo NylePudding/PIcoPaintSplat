@@ -14,8 +14,6 @@ init_lvl=false
 fin={}
 
 function _init()
- 
-	
 	trans.x = 0
 	trans.y = -128
 	trans.vis= false
@@ -35,11 +33,9 @@ function _init()
 	
 	load_lvls()
 	init_lvl(level)
-	
 end
 
 function _update()
-
 	if (time() % 1 == 0.1) then
 		flow()
 		distribute_flow()
@@ -47,24 +43,17 @@ function _update()
 	
 	player_movement()
 	check_fin()
-	
 end
 
 
 function _draw()
-
 	set_splats()
-	
-	
 	draw_bg()
 	draw_fin()
 	draw_player()
 	draw_ui()
 	draw_trans()
-	
-	
 	draw_debug()
-	
 end
 
 function draw_bg()
@@ -74,18 +63,42 @@ end
 
 function draw_ui()
 
+	--DRAW LEVEL UI
 	spr(38,8,112)
 	spr(39,16,112)
-	spr(40,24,112)
+	spr(39,24,112)
+	spr(39,32,112)
 	
 	spr(54,8,120)
 	spr(55,16,120)
-	spr(56,24,120)
+	spr(55,24,120)
+	spr(55,32,120)
 	
-	print("➡️ ".. level,
-		12,118,1)
-	print("➡️ ".. level,
-		12,117,7)
+	print("LEVEL ".. level,11,118,1)
+	print("LEVEL ".. level,11,117,7)
+	
+	--DRAW EAT UI
+	
+	
+	spr(38,88,112)
+	spr(39,96,112)
+	spr(39,104,112)
+	--spr(39,112,112)
+	
+	spr(54,88,120)
+	spr(55,96,120)
+	spr(55,104,120)
+	--spr(55,112,120)
+	
+	--CHEESE
+	spr(27,92,116)
+	print(player.e,104,118,1)
+	print(player.e,104,117,7)
+	
+	
+	
+	
+	
 
 end
 
