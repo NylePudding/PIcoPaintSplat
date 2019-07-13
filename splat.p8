@@ -4,6 +4,7 @@ __lua__
 --setup
 
 splats={}
+cheese={}
 t_flow = 28
 player={}
 trans={}
@@ -43,6 +44,7 @@ function _update()
 	
 	player_movement()
 	check_fin()
+	check_cheese()
 end
 
 
@@ -50,6 +52,7 @@ function _draw()
 	set_splats()
 	draw_bg()
 	draw_fin()
+	draw_cheese()
 	draw_player()
 	draw_ui()
 	draw_trans()
@@ -78,27 +81,18 @@ function draw_ui()
 	print("LEVEL ".. level,11,117,7)
 	
 	--DRAW EAT UI
-	
-	
 	spr(38,88,112)
 	spr(39,96,112)
 	spr(39,104,112)
-	--spr(39,112,112)
 	
 	spr(54,88,120)
 	spr(55,96,120)
 	spr(55,104,120)
-	--spr(55,112,120)
 	
 	--CHEESE
 	spr(27,92,116)
 	print(player.e,104,118,1)
 	print(player.e,104,117,7)
-	
-	
-	
-	
-	
 
 end
 
@@ -111,6 +105,36 @@ function draw_fin()
 	
 	if fin.a > 13 then
 		fin.a = 10
+	end
+end
+
+function draw_cheese()
+
+	for i=1,#cheese do
+		if cheese[i].eaten == false then
+			spr(26,cheese[i].x,cheese[i].y)
+		end
+	
+	end
+
+end
+
+function add_cheese(x,y)
+	local c = {}
+		c.x=x
+		c.y=y
+		c.eaten = false
+		cheese[#cheese+1] = c
+end
+
+function check_cheese()
+	
+	for i=1,#cheese do
+		if cheese[i].eaten == false and player.x == cheese[i].x and player.y == cheese[i].y then
+			cheese[i].eaten = true
+			player.e += 1
+			--cheese yum sound
+		end
 	end
 end
 
@@ -166,6 +190,7 @@ function start_trans()
 		trans.vis = true
 		trans.t_s = time()
 		trans.init = false
+		level = level + 1
 	end
 end
 
@@ -354,59 +379,45 @@ end
 
 function is_wall(x,y)
 
-	local t_x = 
-		((x - (x % 8)) / 8)
-	local t_y = 
-		((y - (y % 8)) / 8)
+	local t_x = ((x - (x % 8)) / 8)
+	local t_y = ((y - (y % 8)) / 8)
 
- if mget(t_x,t_y) ==7 or
- 	mget(t_x,t_y) == 8 or
- 	mget(t_x,t_y) == 23 then
- 	return true
- else
- 	return false
+	if mget(t_x,t_y) ==7 or
+		mget(t_x,t_y) == 8 or
+		mget(t_x,t_y) == 23 then
+		return true
+	else
+		return false
  end
  
 end
 
 function add_splat(x,y,si,c,f)
-
 	if is_splat(x,y)==false then
-	
- 	local s = {}
- 	s.x=x
- 	s.y=y
- 	s.s=si
- 	s.c=c
- 	s.f=f
- 	
- 	splats[#splats+1] = s
- 	splat(s)
- 	t_flow-=1
+		local s = {}
+		s.x=x
+		s.y=y
+		s.s=si
+		s.c=c
+		s.f=f
+		
+		splats[#splats+1] = s
+		splat(s)
+		t_flow-=1
 	end
-	
-	
-	
 end
 
 function get_splat(x,y)
-
 	local s = "null"
-	
 	for i=1,#splats do
 	
-			local spl = splats[i]
+		local spl = splats[i]
 			
-			if spl.x == x
-				and spl.y == y then
-				
-				s = spl
-				
-		 end
+		if spl.x == x and spl.y == y then
+			s = spl
+		end
 	end
-	
 	return s
-
 end
 
 
@@ -736,6 +747,7 @@ levels={}
 function load_lvls()
 
 	levels[1] = lvl_1()
+	levels[2] = lvl_2()
 
 end
 
@@ -785,6 +797,7 @@ function lvl_1()
 		fin.x=12*8
 		fin.y=3*8
 		add_splat(8,8,8,8,4)
+		add_cheese(48,48)
 		--add_splat(72,64,8,8,4)
 
 	end
@@ -799,7 +812,29 @@ end
 
 function lvl_2()
 
+	local lvl = {}
+	local r_p = {}
+	local r_d = {}
 	
+	box_lvl(r_p)
+	
+	local function setup()
+		
+		player.x=4*8
+		player.x_m=4*8
+		player.y=11*8
+		player.y_m=11*8
+		fin.x=12*8
+		fin.y=3*8
+		add_splat(8,8,8,8,4)
+		--add_splat(72,64,8,8,4)
+	end
+	
+	lvl.r_p = r_p
+	lvl.r_d = r_d
+	lvl.s = setup
+	
+	return lvl
 
 end
 
@@ -848,6 +883,7 @@ function init_lvl(lvl)
 	clear_map()
 	
 	splats={}
+	cheese={}
 	
 	init_st_obs(8,r_p)
 	init_st_obs(7,r_d)
