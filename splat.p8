@@ -11,7 +11,7 @@ t_flow = 28
 player={}
 trans={}
 debug=false
-level=2
+level=1
 next_level=1
 init_lvl=false
 fin={}
@@ -126,10 +126,11 @@ function draw_cheese()
 
 end
 
-function add_cheese(x,y)
+function add_cheese(x,y,n)
 	local c = {}
 		c.x=x
 		c.y=y
+		c.n=n
 		c.eaten = false
 		cheese[#cheese+1] = c
 end
@@ -139,7 +140,7 @@ function check_cheese()
 	for i=1,#cheese do
 		if cheese[i].eaten == false and player.x == cheese[i].x and player.y == cheese[i].y then
 			cheese[i].eaten = true
-			player.e += 1
+			player.e += cheese[i].n
 			--cheese yum sound
 		end
 	end
@@ -596,24 +597,20 @@ end
 
 
 function count_walls(x,y)
-
 	local w = 0
-	
 	if is_wall(x,y+8)==true then
- 	w = w + 1
- end
- if is_wall(x,y-8)==true then
- 	w = w + 1	
- end
- if is_wall(x+8,y)==true then
- 	w = w + 1
- end
- if is_wall(x-8,y)==true then
- 	w = w + 1	
- end
- 
- return w
-
+		w = w + 1
+	end
+	if is_wall(x,y-8)==true then
+		w = w + 1	
+	end
+	if is_wall(x+8,y)==true then
+		w = w + 1
+	end
+	if is_wall(x-8,y)==true then
+		w = w + 1	
+	end
+	return w
 end
 
 function count_splats(x,y)
@@ -743,7 +740,6 @@ function player_movement()
 end
 
 function try_move(x,y)
-
 	if is_wall(x,y)==false then
 		player.x_m=x
 		player.y_m=y
@@ -752,11 +748,9 @@ function try_move(x,y)
 		player.t_s=time()
 		return true
 	else
-			break_wall(x,y)
+		break_wall(x,y)
 		return false
 	end
-	
-
 end
 
 function break_wall(x,y)
@@ -840,23 +834,22 @@ function lvl_1()
 	
 	box_lvl(r_p)
 	
-	add_ob(1,9,r_d)
-	add_ob(1,10,r_d)
-	add_ob(2,10,r_d)
-	add_ob(3,10,r_d)
-	add_ob(4,10,r_d)
-	add_ob(1,11,r_d)
-	add_ob(2,11,r_d)
-	add_ob(4,11,r_d)
-	add_ob(1,12,r_d)
-	add_ob(2,12,r_d)
-	add_ob(3,12,r_d)
-	add_ob(4,12,r_d)
-	add_ob(1,13,r_d)
-	add_ob(2,13,r_d)
-	add_ob(3,13,r_d)
-	add_ob(4,13,r_d)
-	add_ob(5,13,r_d)
+	lvl_a = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+			 0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	         0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	         0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	         0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	         0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	         0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	         0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	         1,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	         1,1,1,1,0,0,0,0,0,0,0,0,0,0,
+	         1,1,0,1,0,0,0,0,0,0,0,0,0,0,
+	         1,1,1,1,0,0,0,0,0,0,0,0,0,0,
+	         1,1,1,1,1,0,0,0,0,0,0,0,0,0}
+			 
+	add_array_ob(lvl_a,r_d,r_p)
+	
 	
 	local function setup()
 		
@@ -890,102 +883,21 @@ function lvl_2()
 	
 	box_lvl(r_p)
 	
-	add_ob(1,1,r_d)
-	add_ob(2,1,r_d)
-	add_ob(3,1,r_d)
-	add_ob(4,1,r_d)
-	add_ob(5,1,r_d)
-	add_ob(6,1,r_d)
-	add_ob(7,1,r_d)
-	add_ob(8,1,r_d)
-	add_ob(9,1,r_d)
-	add_ob(10,1,r_d)
-	add_ob(11,1,r_d)
-	add_ob(12,1,r_d)
-	add_ob(13,1,r_d)
-	add_ob(14,1,r_d)
-	
-	add_ob(1,2,r_d)
-	add_ob(2,2,r_d)
-	add_ob(3,2,r_d)
-	add_ob(7,2,r_d)
-	add_ob(8,2,r_d)
-	add_ob(12,2,r_d)
-	add_ob(13,2,r_d)
-	add_ob(14,2,r_d)
-	
-	add_ob(1,3,r_d)
-	add_ob(2,3,r_d)
-	add_ob(13,3,r_d)
-	add_ob(14,3,r_d)
-	
-	add_ob(1,4,r_d)
-	add_ob(14,4,r_d)
-	
-	add_ob(1,5,r_d)
-	add_ob(14,5,r_d)
-	
-	add_ob(1,6,r_d)
-	add_ob(14,6,r_d)
-	
-	add_ob(1,7,r_d)
-	add_ob(14,7,r_d)
-	
-	add_ob(1,8,r_d)
-	add_ob(2,8,r_d)
-	add_ob(13,8,r_d)
-	add_ob(14,8,r_d)
-	
-	add_ob(1,9,r_d)
-	add_ob(2,9,r_d)
-	add_ob(3,9,r_d)
-	add_ob(12,9,r_d)
-	add_ob(13,9,r_d)
-	add_ob(14,9,r_d)
-	
-	add_ob(1,10,r_d)
-	add_ob(2,10,r_d)
-	add_ob(3,10,r_d)
-	add_ob(4,10,r_d)
-	add_ob(11,10,r_d)
-	add_ob(12,10,r_d)
-	add_ob(13,10,r_d)
-	add_ob(14,10,r_d)
-	
-	add_ob(1,11,r_d)
-	add_ob(2,11,r_d)
-	add_ob(3,11,r_d)
-	add_ob(4,11,r_d)
-	add_ob(5,11,r_d)
-	add_ob(10,11,r_d)
-	add_ob(11,11,r_d)
-	add_ob(12,11,r_d)
-	add_ob(14,11,r_d)
-	
-	add_ob(1,12,r_d)
-	add_ob(2,12,r_d)
-	add_ob(4,12,r_d)
-	add_ob(5,12,r_d)
-	add_ob(6,12,r_d)
-	add_ob(9,12,r_d)
-	add_ob(10,12,r_d)
-	add_ob(11,12,r_d)
-	add_ob(14,12,r_d)
-	
-	add_ob(1,13,r_d)
-	add_ob(2,13,r_d)
-	add_ob(3,13,r_d)
-	add_ob(4,13,r_d)
-	add_ob(5,13,r_d)
-	add_ob(6,13,r_d)
-	add_ob(7,13,r_d)
-	add_ob(8,13,r_d)
-	add_ob(9,13,r_d)
-	add_ob(10,13,r_d)
-	add_ob(11,13,r_d)
-	add_ob(12,13,r_d)
-	add_ob(13,13,r_d)
-	add_ob(14,13,r_d)
+	lvl_a = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+			 1,1,1,0,0,0,1,1,0,0,0,1,1,1,
+	         1,1,0,0,0,0,0,0,0,0,0,0,1,1,
+	         1,0,0,0,0,0,0,0,0,0,0,0,0,1,
+	         1,0,0,0,0,0,0,0,0,0,0,0,0,1,
+	         1,0,0,0,0,0,0,0,0,0,0,0,0,1,
+	         1,0,0,0,0,0,0,0,0,0,0,0,0,1,
+	         1,1,0,0,0,0,0,0,0,0,0,0,1,1,
+	         1,1,1,0,0,0,0,0,0,0,0,1,1,1,
+	         1,1,1,1,0,0,0,0,0,0,1,1,1,1,
+	         1,1,1,1,1,0,0,0,0,1,1,1,0,1,
+	         1,1,0,1,1,1,0,0,1,1,1,0,0,1,
+	         1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+			 
+	add_array_ob(lvl_a,r_d,r_p)
 	
 	local function setup()
 		
@@ -995,7 +907,7 @@ function lvl_2()
 		player.y_m=12*8
 		fin.x=13*8
 		fin.y=12*8
-		add_cheese(4*8,4*8)
+		add_cheese(4*8,4*8,3)
 		--add_splat(8,8,8,8,4)
 		--add_splat(72,64,8,8,4)
 	end
@@ -1017,6 +929,31 @@ function add_ob(x,y,lst)
 	ob.x = x
 	ob.y = y
 	lst[#lst+1] = ob
+end
+
+function add_array_ob(a,r_d,r_p)
+	local lst = {}
+	local x = 1
+	local y = 1
+	for i=1,#a do
+		if a[i] == 1 then 
+			local ob = {}
+			ob.x = x
+			ob.y = y
+			r_d[#r_d+1] = ob
+		elseif a[i] == 2 then
+			local ob = {}
+			ob.x = x
+			ob.y = y
+			r_p[#r_p+1] = ob
+		end
+		x+=1
+		if (x >14) then
+			x=1
+			y+=1
+		end
+	end
+	return lst
 end
 
 
