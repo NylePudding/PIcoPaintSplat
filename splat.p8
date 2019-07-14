@@ -5,11 +5,13 @@ __lua__
 
 splats={}
 cheese={}
+switches={}
+gates={}
 t_flow = 28
 player={}
 trans={}
 debug=false
-level=1
+level=2
 next_level=1
 init_lvl=false
 fin={}
@@ -45,15 +47,21 @@ function _update()
 	player_movement()
 	check_fin()
 	check_cheese()
+	check_switches()
+	check_gates()
 end
 
 
 function _draw()
 	set_splats()
 	draw_bg()
+	
 	draw_fin()
 	draw_cheese()
+	draw_switches()
+	draw_gates()
 	draw_player()
+	
 	draw_ui()
 	draw_trans()
 	draw_debug()
@@ -114,7 +122,6 @@ function draw_cheese()
 		if cheese[i].eaten == false then
 			spr(26,cheese[i].x,cheese[i].y)
 		end
-	
 	end
 
 end
@@ -134,6 +141,66 @@ function check_cheese()
 			cheese[i].eaten = true
 			player.e += 1
 			--cheese yum sound
+		end
+	end
+end
+
+function draw_switches()
+	for i=1,#switches do
+		if switches[i].on == true then
+			spr(43,switches[i].x,switches[i].y)
+		else
+			spr(42,switches[i].x,switches[i].y)
+		end
+	end
+end
+
+function add_switch(x,y,n)
+	local s = {}
+	s.x = x
+	s.y = y
+	s.n = n
+	s.on = false
+	switches[#switches+1] = s
+end
+
+function check_switches()
+	for i=1,#switches do
+		if is_splat(switches[i].x,switches[i].y) == true then
+			switches[i].on = true
+		else
+			switches[i].on = false
+		end
+	end
+end
+
+function draw_gates()
+	for i=1,#gates do
+		if gates[i].open == true then
+			spr(58,gates[i].x,gates[i].y)
+		else
+			spr(57,gates[i].x,gates[i].y)
+		end
+	end
+end
+
+function add_gate(x,y,n)
+	local g = {}
+	g.x = x
+	g.y = y
+	g.n = n
+	g.open = false
+	gates[#gates+1] = g
+end
+
+function check_gates()
+	for i=1,#gates do
+		for j=1, #switches do
+			if gates[i].n == switches[j].n and switches[j].on == true then
+				gates[i].open = true
+			elseif gates[i].n == switches[j].n and switches[j].on == false then
+				gates[i].open = false
+			end
 		end
 	end
 end
@@ -381,12 +448,19 @@ function is_wall(x,y)
 
 	local t_x = ((x - (x % 8)) / 8)
 	local t_y = ((y - (y % 8)) / 8)
+	
+	
 
 	if mget(t_x,t_y) ==7 or
 		mget(t_x,t_y) == 8 or
 		mget(t_x,t_y) == 23 then
 		return true
 	else
+		for i=1,#gates do
+			if gates[i].x == x and gates[i].y == y and gates[i].open == false then
+				return true
+			end
+		end
 		return false
  end
  
@@ -690,6 +764,12 @@ function break_wall(x,y)
 		return
 	end
 	
+	for i=1,#gates do
+		if gates[i].x == x and gates[i].y == y and gates[i].open == false then
+			return true
+		end
+	end
+	
 	local b_x = 
 		((x - (x % 8)) / 8)
 	local b_y = 
@@ -760,44 +840,36 @@ function lvl_1()
 	
 	box_lvl(r_p)
 	
-	add_ob(1,2,r_d)
-	add_ob(2,2,r_d)
-	add_ob(2,1,r_d)
-	
+	add_ob(1,9,r_d)
 	add_ob(1,10,r_d)
 	add_ob(2,10,r_d)
 	add_ob(3,10,r_d)
+	add_ob(4,10,r_d)
 	add_ob(1,11,r_d)
 	add_ob(2,11,r_d)
+	add_ob(4,11,r_d)
 	add_ob(1,12,r_d)
 	add_ob(2,12,r_d)
+	add_ob(3,12,r_d)
+	add_ob(4,12,r_d)
 	add_ob(1,13,r_d)
 	add_ob(2,13,r_d)
 	add_ob(3,13,r_d)
 	add_ob(4,13,r_d)
 	add_ob(5,13,r_d)
 	
-	add_ob(4,10,r_d)
-	add_ob(5,10,r_d)
-	add_ob(3,11,r_d)
-	add_ob(5,11,r_d)
-	add_ob(3,12,r_d)
-	add_ob(4,12,r_d)
-	add_ob(5,12,r_d)
-	
-	
-	
-	
 	local function setup()
 		
-		player.x=4*8
-		player.x_m=4*8
+		player.x=3*8
+		player.x_m=3*8
 		player.y=11*8
 		player.y_m=11*8
 		fin.x=12*8
 		fin.y=3*8
-		add_splat(8,8,8,8,4)
-		add_cheese(48,48)
+		--add_splat(8,8,8,8,4)
+		--add_switch(8,24,1)
+		--add_cheese(48,48)
+		--add_gate(8,32,1)
 		--add_splat(72,64,8,8,4)
 
 	end
@@ -818,15 +890,113 @@ function lvl_2()
 	
 	box_lvl(r_p)
 	
+	add_ob(1,1,r_d)
+	add_ob(2,1,r_d)
+	add_ob(3,1,r_d)
+	add_ob(4,1,r_d)
+	add_ob(5,1,r_d)
+	add_ob(6,1,r_d)
+	add_ob(7,1,r_d)
+	add_ob(8,1,r_d)
+	add_ob(9,1,r_d)
+	add_ob(10,1,r_d)
+	add_ob(11,1,r_d)
+	add_ob(12,1,r_d)
+	add_ob(13,1,r_d)
+	add_ob(14,1,r_d)
+	
+	add_ob(1,2,r_d)
+	add_ob(2,2,r_d)
+	add_ob(3,2,r_d)
+	add_ob(7,2,r_d)
+	add_ob(8,2,r_d)
+	add_ob(12,2,r_d)
+	add_ob(13,2,r_d)
+	add_ob(14,2,r_d)
+	
+	add_ob(1,3,r_d)
+	add_ob(2,3,r_d)
+	add_ob(13,3,r_d)
+	add_ob(14,3,r_d)
+	
+	add_ob(1,4,r_d)
+	add_ob(14,4,r_d)
+	
+	add_ob(1,5,r_d)
+	add_ob(14,5,r_d)
+	
+	add_ob(1,6,r_d)
+	add_ob(14,6,r_d)
+	
+	add_ob(1,7,r_d)
+	add_ob(14,7,r_d)
+	
+	add_ob(1,8,r_d)
+	add_ob(2,8,r_d)
+	add_ob(13,8,r_d)
+	add_ob(14,8,r_d)
+	
+	add_ob(1,9,r_d)
+	add_ob(2,9,r_d)
+	add_ob(3,9,r_d)
+	add_ob(12,9,r_d)
+	add_ob(13,9,r_d)
+	add_ob(14,9,r_d)
+	
+	add_ob(1,10,r_d)
+	add_ob(2,10,r_d)
+	add_ob(3,10,r_d)
+	add_ob(4,10,r_d)
+	add_ob(11,10,r_d)
+	add_ob(12,10,r_d)
+	add_ob(13,10,r_d)
+	add_ob(14,10,r_d)
+	
+	add_ob(1,11,r_d)
+	add_ob(2,11,r_d)
+	add_ob(3,11,r_d)
+	add_ob(4,11,r_d)
+	add_ob(5,11,r_d)
+	add_ob(10,11,r_d)
+	add_ob(11,11,r_d)
+	add_ob(12,11,r_d)
+	add_ob(14,11,r_d)
+	
+	add_ob(1,12,r_d)
+	add_ob(2,12,r_d)
+	add_ob(4,12,r_d)
+	add_ob(5,12,r_d)
+	add_ob(6,12,r_d)
+	add_ob(9,12,r_d)
+	add_ob(10,12,r_d)
+	add_ob(11,12,r_d)
+	add_ob(14,12,r_d)
+	
+	add_ob(1,13,r_d)
+	add_ob(2,13,r_d)
+	add_ob(3,13,r_d)
+	add_ob(4,13,r_d)
+	add_ob(5,13,r_d)
+	add_ob(6,13,r_d)
+	add_ob(7,13,r_d)
+	add_ob(8,13,r_d)
+	add_ob(9,13,r_d)
+	add_ob(10,13,r_d)
+	add_ob(11,13,r_d)
+	add_ob(12,13,r_d)
+	add_ob(13,13,r_d)
+	add_ob(14,13,r_d)
+	
 	local function setup()
 		
-		player.x=4*8
-		player.x_m=4*8
-		player.y=11*8
-		player.y_m=11*8
-		fin.x=12*8
-		fin.y=3*8
-		add_splat(8,8,8,8,4)
+		player.x=3*8
+		player.x_m=3*8
+		player.y=12*8
+		player.y_m=12*8
+		fin.x=13*8
+		fin.y=12*8
+		add_cheese(4*8,4*8)
+		--add_splat(8,8,8,8,4)
 		--add_splat(72,64,8,8,4)
 	end
 	
@@ -884,6 +1054,9 @@ function init_lvl(lvl)
 	
 	splats={}
 	cheese={}
+	switches={}
+	gates={}
+	t_flow=28
 	
 	init_st_obs(8,r_p)
 	init_st_obs(7,r_d)
@@ -937,22 +1110,22 @@ __gfx__
 88888880888800000888888888888880088888800000000000000000dddd1dd60000000000cccc00a0aaaaa000aaaaa000000000000000000000000000000000
 88888800888000000888888888888880088888800000000000000000ddd1ddd60000000000ccccc0000000000000000000000000000000000000000000000000
 000000000000000008888888888888800888888000000000000000000650566000000000000ccc0c00000a000000000000000000000000000000000000000000
-08888880088888800888888888888888000000000000000011111111111111111111111100000000000000000000000000000000000000000000000000000000
-0888888008888880088888888888888888888888000000001dddddddddddddddddddddd600000000000000000000000000000000000000000000000000000000
-0888888008888880088888888888888888888888000000001dddddddddddddddddddddd600000000000000000000000000000000000000000000000000000000
-0888888000888800088888888888888888888888000000001dddddddddddddddddddddd600000000000000000000000000000000000000000000000000000000
-0888888000000000088888888888888888888888000000001dddddddddddddddddddddd600000000000000000000000000000000000000000000000000000000
-0888888000000000008888888888888888888888000000001dddddddddddddddddddddd600000000000000000000000000000000000000000000000000000000
-0088880000000000000888888888888888888888000000001dddddddddddddddddddddd600000000000000000000000000000000000000000000000000000000
+08888880088888800888888888888888000000000000000011111111111111111111111100000000000022000000990000000000000000000000000000000000
+0888888008888880088888888888888888888888000000001dddddddddddddddddddddd600000000000220000009900000000000000000000000000000000000
+0888888008888880088888888888888888888888000000001dddddddddddddddddddddd600000000002200000099000000000000000000000000000000000000
+0888888000888800088888888888888888888888000000001dddddddddddddddddddddd600000000022222200999999000000000000000000000000000000000
+0888888000000000088888888888888888888888000000001dddddddddddddddddddddd600000000000022000000990000000000000000000000000000000000
+0888888000000000008888888888888888888888000000001dddddddddddddddddddddd600000000000220000009900000000000000000000000000000000000
+0088880000000000000888888888888888888888000000001dddddddddddddddddddddd600000000002200000099000000000000000000000000000000000000
 0000000000000000000000000000000000000000000000001dddddddddddddddddddddd600000000000000000000000000000000000000000000000000000000
-0000000000000000888888800888888800000000000000001dddddddddddddddddddddd600000000000000000000000000000000000000000000000000000000
-0088888800000888888888800888888800888800000000001dddddddddddddddddddddd600000000000000000000000000000000000000000000000000000000
-0888888800008888888888800888888808888880000000001dddddddddddddddddddddd600000000000000000808080800000000000000000000000000000000
-0888888800008888888888800888888808888880000000001dddddddddddddddddddddd600000000000000008080808000000000000000000000000000000000
-0888888800008888888888800888888808888880000000001dddddddddddddddddddddd600000000000000000808080800000000000000000000000000000000
-0888888800008888888888000888888808888880000000001dddddddddddddddddddddd600000000000000008080808000088000000000000000000000000000
-0088888800000888888880000888888808888880000000001dddddddddddddddddddddd600000000000000000888088880888808000000000000000000000000
-00000000000000000000000008888888088888800000000016666666666666666666666600000000000000008888888888888888000000000000000000000000
+0000000000000000888888800888888800000000000000001dddddddddddddddddddddd611111111000000000000000000000000000000000000000000000000
+0088888800000888888888800888888800888800000000001dddddddddddddddddddddd61dd61dd6010000100000000000000000000000000000000000000000
+0888888800008888888888800888888808888880000000001dddddddddddddddddddddd61dd61dd6011001100808080800000000000000000000000000000000
+0888888800008888888888800888888808888880000000001dddddddddddddddddddddd61dd61dd6011001108080808000000000000000000000000000000000
+0888888800008888888888800888888808888880000000001dddddddddddddddddddddd61dd61dd6011001100808080800000000000000000000000000000000
+0888888800008888888888000888888808888880000000001dddddddddddddddddddddd61dd61dd6011001108080808000088000000000000000000000000000
+0088888800000888888880000888888808888880000000001dddddddddddddddddddddd61dd61dd6010000100888088880888808000000000000000000000000
+00000000000000000000000008888888088888800000000016666666666666666666666616661666000000008888888888888888000000000000000000000000
 00000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __sfx__
 0001000008750087500975009750097500a7500b7500c7500e7500410005100031000310003100051000010017000190001b0001c0001d0001e0001e0001e0001e0001e000040000400003000030000200002000
